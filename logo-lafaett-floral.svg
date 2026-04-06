@@ -1,0 +1,49 @@
+<svg width="900" height="260" viewBox="0 0 900 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="260" fill="transparent"></rect>
+
+  <!-- Flores esquerda -->
+  <g transform="translate(95,88)">
+    <ellipse cx="0" cy="28" rx="18" ry="34" fill="#7E9C74" transform="rotate(-28 0 28)"></ellipse>
+    <ellipse cx="30" cy="8" rx="14" ry="28" fill="#90AE86" transform="rotate(18 30 8)"></ellipse>
+    <ellipse cx="42" cy="46" rx="14" ry="28" fill="#6F8C66" transform="rotate(38 42 46)"></ellipse>
+
+    <circle cx="72" cy="38" r="28" fill="#F6D7D7"></circle>
+    <circle cx="94" cy="28" r="24" fill="#F9E2E2"></circle>
+    <circle cx="104" cy="54" r="22" fill="#F3C7C7"></circle>
+    <circle cx="78" cy="62" r="20" fill="#F8DDDD"></circle>
+    <circle cx="60" cy="18" r="18" fill="#F2C1C1"></circle>
+    <circle cx="84" cy="42" r="9" fill="#E8B07A"></circle>
+
+    <ellipse cx="126" cy="20" rx="12" ry="20" fill="#8BA881" transform="rotate(-18 126 20)"></ellipse>
+    <ellipse cx="136" cy="48" rx="10" ry="18" fill="#79946F" transform="rotate(22 136 48)"></ellipse>
+  </g>
+
+  <!-- Flores direita -->
+  <g transform="translate(700,74) scale(-1,1)">
+    <ellipse cx="0" cy="28" rx="18" ry="34" fill="#7E9C74" transform="rotate(-28 0 28)"></ellipse>
+    <ellipse cx="30" cy="8" rx="14" ry="28" fill="#90AE86" transform="rotate(18 30 8)"></ellipse>
+    <ellipse cx="42" cy="46" rx="14" ry="28" fill="#6F8C66" transform="rotate(38 42 46)"></ellipse>
+
+    <circle cx="72" cy="38" r="28" fill="#F6D7D7"></circle>
+    <circle cx="94" cy="28" r="24" fill="#F9E2E2"></circle>
+    <circle cx="104" cy="54" r="22" fill="#F3C7C7"></circle>
+    <circle cx="78" cy="62" r="20" fill="#F8DDDD"></circle>
+    <circle cx="60" cy="18" r="18" fill="#F2C1C1"></circle>
+    <circle cx="84" cy="42" r="9" fill="#E8B07A"></circle>
+
+    <ellipse cx="126" cy="20" rx="12" ry="20" fill="#8BA881" transform="rotate(-18 126 20)"></ellipse>
+    <ellipse cx="136" cy="48" rx="10" ry="18" fill="#79946F" transform="rotate(22 136 48)"></ellipse>
+  </g>
+
+  <!-- Nome -->
+  <text x="450" y="108" text-anchor="middle" font-size="92" font-family="'Great Vibes', 'Brush Script MT', cursive" fill="#1F1714">
+    Lafaett
+  </text>
+
+  <text x="450" y="162" text-anchor="middle" font-size="34" letter-spacing="8" font-family="'Montserrat', Arial, sans-serif" fill="#B87D58" font-weight="600">
+    MODAS
+  </text>
+
+  <!-- Linha delicada -->
+  <line x1="285" y1="178" x2="615" y2="178" stroke="#D8B8A1" stroke-width="2" opacity="0.8"></line>
+</svg>
