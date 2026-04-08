@@ -48,9 +48,9 @@ a {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(249, 244, 238, 0.95);
+  background: #000000;
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 215, 120, 0.18);
 }
 
 .nav {
@@ -72,7 +72,7 @@ a {
 }
 
 .brand-logo {
-  width: 170px;
+  width: 190px;
   max-width: 100%;
   height: auto;
   display: block;
@@ -86,7 +86,7 @@ a {
 
 .menu a {
   font-size: 0.92rem;
-  color: var(--text-soft);
+  color: rgba(255, 255, 255, 0.82);
   transition: 0.3s;
   position: relative;
   font-weight: 500;
@@ -99,12 +99,12 @@ a {
   bottom: -6px;
   width: 0;
   height: 1.5px;
-  background: var(--accent);
+  background: #f0c46a;
   transition: 0.3s;
 }
 
 .menu a:hover {
-  color: var(--accent);
+  color: #f0c46a;
 }
 
 .menu a:hover::after {
@@ -700,8 +700,9 @@ a {
   }
 
   .nav-whatsapp {
-    display: none;
-  }
+  background: linear-gradient(135deg, #d9a441, #b97a1f);
+  color: #fff;
+}
 
   .hero-floating-card {
     position: static;
