@@ -697,9 +697,8 @@ a {
   }
 
   .nav-whatsapp {
-  background: linear-gradient(135deg, #d9a441, #b97a1f);
-  color: #fff;
-  padding: 11px 24px;
+  width: 100%;
+  justify-content: center;
 }
 
   .hero-floating-card {
@@ -711,18 +710,28 @@ a {
 
 @media (max-width: 768px) {
   .nav {
-    flex-wrap: wrap;
-    padding: 14px 0;
-  }
+  position: relative;
+  justify-content: center;
+}
 
-  .brand-logo {
-    width: 125px;
-  }
+.brand {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 
-  .menu-toggle {
-    display: block;
-    margin-left: auto;
-  }
+.brand a {
+  display: flex;
+  justify-content: center;
+}
+
+.menu-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0;
+}
 
   .menu {
     width: 100%;
