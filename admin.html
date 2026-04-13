@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin | Lafaett Modas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Lafaett Modas</h1>
+        <p>Painel Administrativo</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-section="login-section">Login</button>
+        <button class="nav-btn" data-section="dashboard-section">Dashboard</button>
+        <button class="nav-btn" data-section="category-section">Categorias</button>
+        <button class="nav-btn" data-section="product-section">Produtos</button>
+      </nav>
+
+      <button id="logoutBtn" class="logout-btn hidden">Sair</button>
+    </aside>
+
+    <main class="content">
+      <section id="login-section" class="panel-section active">
+        <div class="panel-card auth-card">
+          <div class="section-heading">
+            <span class="eyebrow">Acesso restrito</span>
+            <h2>Entrar no painel</h2>
+            <p>Use o e-mail autorizado no Supabase para acessar o admin da loja.</p>
+          </div>
+
+          <form id="loginForm" class="form-grid">
+            <div class="field">
+              <label for="loginEmail">E-mail</label>
+              <input type="email" id="loginEmail" placeholder="seuemail@gmail.com" required />
+            </div>
+
+            <div class="field">
+              <label for="loginPassword">Senha</label>
+              <input type="password" id="loginPassword" placeholder="Digite sua senha" required />
+            </div>
+
+            <button type="submit" class="btn-primary full">Entrar</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="dashboard-section" class="panel-section">
+        <div class="section-heading">
+          <span class="eyebrow">Visão geral</span>
+          <h2>Dashboard</h2>
+          <p>Resumo rápido do catálogo da loja.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span>Total de produtos</span>
+            <strong id="totalProducts">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Total de categorias</span>
+            <strong id="totalCategories">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Produtos em promoção</span>
+            <strong id="totalPromos">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Produtos em destaque</span>
+            <strong id="totalFeatured">0</strong>
+          </div>
+        </div>
+      </section>
+
+      <section id="category-section" class="panel-section">
+        <div class="section-heading">
+          <span class="eyebrow">Organização</span>
+          <h2>Cadastrar categoria</h2>
+          <p>Crie novas abas como Promoções, Novidades ou qualquer outra.</p>
+        </div>
+
+        <div class="panel-card">
+          <form id="categoryForm" class="form-grid">
+            <div class="field">
+              <label for="categoryName">Nome da categoria</label>
+              <input type="text" id="categoryName" placeholder="Ex: Promoções" required />
+            </div>
+
+            <div class="field">
+              <label for="categorySlug">Slug</label>
+              <input type="text" id="categorySlug" placeholder="Ex: promocoes" required />
+            </div>
+
+            <div class="field">
+              <label for="categoryOrder">Ordem</label>
+              <input type="number" id="categoryOrder" placeholder="0" value="0" />
+            </div>
+
+            <div class="field checkbox-field">
+              <label>
+                <input type="checkbox" id="categoryActive" checked />
+                Categoria ativa
+              </label>
+            </div>
+
+            <button type="submit" class="btn-primary">Salvar categoria</button>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <h3 class="subheading">Categorias cadastradas</h3>
+          <div id="categoriesList" class="list-grid"></div>
+        </div>
+      </section>
+
+      <section id="product-section" class="panel-section">
+        <div class="section-heading">
+          <span class="eyebrow">Catálogo</span>
+          <h2>Cadastrar produto</h2>
+          <p>Adicione novas roupas, preço, foto, tamanhos, categoria e promoção.</p>
+        </div>
+
+        <div class="panel-card">
+          <form id="productForm" class="form-grid">
+            <div class="field">
+              <label for="productName">Nome do produto</label>
+              <input type="text" id="productName" placeholder="Ex: Conjunto Atena" required />
+            </div>
+
+            <div class="field">
+              <label for="productSlug">Slug</label>
+              <input type="text" id="productSlug" placeholder="Ex: conjunto-atena" required />
+            </div>
+
+            <div class="field">
+              <label for="productPrice">Preço</label>
+              <input type="number" step="0.01" id="productPrice" placeholder="140.00" required />
+            </div>
+
+            <div class="field">
+              <label for="productCategory">Categoria</label>
+              <select id="productCategory" required>
+                <option value="">Selecione</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="productSizes">Tamanhos</label>
+              <input type="text" id="productSizes" placeholder="Ex: P/M/G ou M/G/GG" />
+            </div>
+
+            <div class="field">
+              <label for="productImage">Imagem</label>
+              <input type="file" id="productImage" accept="image/*" />
+            </div>
+
+            <div class="field full">
+              <label for="productDescription">Descrição</label>
+              <textarea id="productDescription" rows="4" placeholder="Descreva a peça"></textarea>
+            </div>
+
+            <div class="field checkbox-field">
+              <label>
+                <input type="checkbox" id="productPromo" />
+                Produto em promoção
+              </label>
+            </div>
+
+            <div class="field checkbox-field">
+              <label>
+                <input type="checkbox" id="productFeatured" />
+                Produto em destaque
+              </label>
+            </div>
+
+            <div class="field checkbox-field">
+              <label>
+                <input type="checkbox" id="productActive" checked />
+                Produto ativo
+              </label>
+            </div>
+
+            <button type="submit" class="btn-primary">Salvar produto</button>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <h3 class="subheading">Produtos cadastrados</h3>
+          <div id="productsList" class="products-admin-grid"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    window.SUPABASE_URL = "https://nikkvbgoozjeavwvmhjh.supabase.co";
+    window.SUPABASE_ANON_KEY = "sb_publishable_uo3sk48kKVnZA6Fav_G_fw_GgahFdd-";
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
