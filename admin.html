@@ -14,21 +14,20 @@
 </head>
 <body>
   <div class="admin-shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <h1>Lafaett Modas</h1>
-        <p>Painel Administrativo</p>
-      </div>
+    <aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <h1>Lafaett Modas</h1>
+    <p>Painel Administrativo</p>
+  </div>
 
-      <nav class="sidebar-nav">
-        <button class="nav-btn active" data-section="login-section">Login</button>
-        <button class="nav-btn" data-section="dashboard-section">Dashboard</button>
-        <button class="nav-btn" data-section="category-section">Categorias</button>
-        <button class="nav-btn" data-section="product-section">Produtos</button>
-      </nav>
+  <nav class="sidebar-nav">
+    <button class="nav-btn hidden" id="navDashboard" data-section="dashboard-section">Dashboard</button>
+    <button class="nav-btn hidden" id="navCategories" data-section="category-section">Categorias</button>
+    <button class="nav-btn hidden" id="navProducts" data-section="product-section">Produtos</button>
+  </nav>
 
-      <button id="logoutBtn" class="logout-btn hidden">Sair</button>
-    </aside>
+  <button id="logoutBtn" class="logout-btn hidden">Sair</button>
+</aside>
 
     <main class="content">
       <section id="login-section" class="panel-section active">

@@ -425,3 +425,8 @@ textarea {
     font-size: 2rem;
   }
 }
+
+.auth-only .sidebar-nav,
+.auth-only .logout-btn {
+  display: none;
+}

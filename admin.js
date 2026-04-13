@@ -67,24 +67,37 @@ function setActiveSection(sectionId) {
 }
 
 function setLoggedInUI(isLoggedIn) {
+  const sidebar = document.getElementById("sidebar");
+  const navDashboard = document.getElementById("navDashboard");
+  const navCategories = document.getElementById("navCategories");
+  const navProducts = document.getElementById("navProducts");
+
   logoutBtn.classList.toggle("hidden", !isLoggedIn);
 
   if (isLoggedIn) {
+    document.body.classList.remove("auth-only");
+
+    navDashboard.classList.remove("hidden");
+    navCategories.classList.remove("hidden");
+    navProducts.classList.remove("hidden");
+
     setActiveSection("dashboard-section");
   } else {
-    setActiveSection("login-section");
+    document.body.classList.add("auth-only");
+
+    navDashboard.classList.add("hidden");
+    navCategories.classList.add("hidden");
+    navProducts.classList.add("hidden");
+
+    sections.forEach((section) => {
+      section.classList.remove("active");
+    });
+
+    document.getElementById("login-section").classList.add("active");
+
+    navButtons.forEach((btn) => btn.classList.remove("active"));
   }
 }
-
-navButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (btn.dataset.section !== "login-section") {
-      setActiveSection(btn.dataset.section);
-    } else {
-      setActiveSection("login-section");
-    }
-  });
-});
 
 async function uploadProductImage(file, slug) {
   if (!file) return null;
