@@ -22,13 +22,17 @@ const totalFeatured = document.getElementById("totalFeatured");
 
 const toast = document.getElementById("toast");
 
+let currentCategories = [];
+let currentProducts = [];
+let editingProductId = null;
+let editingCategoryId = null;
+
 function showToast(message, type = "success") {
   toast.textContent = message;
   toast.className = `toast show ${type}`;
-
   setTimeout(() => {
     toast.className = "toast";
-  }, 3000);
+  }, 3200);
 }
 
 function slugify(text) {
@@ -50,14 +54,15 @@ function formatPrice(value) {
   });
 }
 
-function setActiveSection(sectionId) {
-  sections.forEach((section) => {
-    section.classList.remove("active");
-  });
+function sectionExists(id) {
+  return !!document.getElementById(id);
+}
 
-  navButtons.forEach((btn) => {
-    btn.classList.remove("active");
-  });
+function setActiveSection(sectionId) {
+  if (!sectionExists(sectionId)) return;
+
+  sections.forEach((section) => section.classList.remove("active"));
+  navButtons.forEach((btn) => btn.classList.remove("active"));
 
   const targetSection = document.getElementById(sectionId);
   if (targetSection) targetSection.classList.add("active");
@@ -67,36 +72,33 @@ function setActiveSection(sectionId) {
 }
 
 function setLoggedInUI(isLoggedIn) {
-  const sidebar = document.getElementById("sidebar");
   const navDashboard = document.getElementById("navDashboard");
   const navCategories = document.getElementById("navCategories");
   const navProducts = document.getElementById("navProducts");
 
   logoutBtn.classList.toggle("hidden", !isLoggedIn);
 
+  if (navDashboard) navDashboard.classList.toggle("hidden", !isLoggedIn);
+  if (navCategories) navCategories.classList.toggle("hidden", !isLoggedIn);
+  if (navProducts) navProducts.classList.toggle("hidden", !isLoggedIn);
+
   if (isLoggedIn) {
     document.body.classList.remove("auth-only");
-
-    navDashboard.classList.remove("hidden");
-    navCategories.classList.remove("hidden");
-    navProducts.classList.remove("hidden");
-
     setActiveSection("dashboard-section");
   } else {
     document.body.classList.add("auth-only");
-
-    navDashboard.classList.add("hidden");
-    navCategories.classList.add("hidden");
-    navProducts.classList.add("hidden");
-
-    sections.forEach((section) => {
-      section.classList.remove("active");
-    });
-
-    document.getElementById("login-section").classList.add("active");
-
-    navButtons.forEach((btn) => btn.classList.remove("active"));
+    setActiveSection("login-section");
   }
+}
+
+function attachNavEvents() {
+  navButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.section;
+      if (!target) return;
+      setActiveSection(target);
+    });
+  });
 }
 
 async function uploadProductImage(file, slug) {
@@ -112,12 +114,75 @@ async function uploadProductImage(file, slug) {
       upsert: true,
     });
 
-  if (uploadError) {
-    throw uploadError;
-  }
+  if (uploadError) throw uploadError;
 
   const { data } = supabaseClient.storage.from("products").getPublicUrl(filePath);
   return data.publicUrl;
+}
+
+function renderCategories() {
+  categoriesList.innerHTML = "";
+  productCategory.innerHTML = `<option value="">Selecione</option>`;
+
+  currentCategories.forEach((category) => {
+    const item = document.createElement("div");
+    item.className = "category-item";
+    item.innerHTML = `
+      <h4>${category.name}</h4>
+      <p>Slug: ${category.slug}</p>
+      <p>Ordem: ${category.order_index}</p>
+      <p>Status: ${category.active ? "Ativa" : "Inativa"}</p>
+      <div class="product-meta" style="margin-top:12px">
+        <button class="btn-primary action-btn" data-action="edit-category" data-id="${category.id}" type="button">Editar</button>
+        <button class="btn-primary action-btn delete-btn" data-action="delete-category" data-id="${category.id}" type="button" style="background:#a73131;color:#fff;">Excluir</button>
+      </div>
+    `;
+    categoriesList.appendChild(item);
+
+    if (category.active) {
+      const option = document.createElement("option");
+      option.value = category.id;
+      option.textContent = category.name;
+      productCategory.appendChild(option);
+    }
+  });
+
+  totalCategories.textContent = String(currentCategories.length);
+}
+
+function renderProducts() {
+  productsList.innerHTML = "";
+
+  currentProducts.forEach((product) => {
+    const item = document.createElement("div");
+    item.className = "product-admin-item";
+
+    item.innerHTML = `
+      <img src="${product.image_url || "https://placehold.co/300x300?text=Sem+Imagem"}" alt="${product.name}" />
+      <div>
+        <h4>${product.name}</h4>
+        <p>${product.description || "Sem descrição."}</p>
+        <div class="product-meta">
+          <span class="meta-badge">${formatPrice(product.price)}</span>
+          <span class="meta-badge">${product.categories?.name || "Sem categoria"}</span>
+          ${product.sizes ? `<span class="meta-badge">${product.sizes}</span>` : ""}
+          ${product.is_promo ? `<span class="meta-badge">Promoção</span>` : ""}
+          ${product.is_featured ? `<span class="meta-badge">Destaque</span>` : ""}
+          <span class="meta-badge">${product.active ? "Ativo" : "Inativo"}</span>
+        </div>
+        <div class="product-meta" style="margin-top:12px">
+          <button class="btn-primary action-btn" data-action="edit-product" data-id="${product.id}" type="button">Editar</button>
+          <button class="btn-primary action-btn delete-btn" data-action="delete-product" data-id="${product.id}" type="button" style="background:#a73131;color:#fff;">Excluir</button>
+        </div>
+      </div>
+    `;
+
+    productsList.appendChild(item);
+  });
+
+  totalProducts.textContent = String(currentProducts.length);
+  totalPromos.textContent = String(currentProducts.filter((item) => item.is_promo).length);
+  totalFeatured.textContent = String(currentProducts.filter((item) => item.is_featured).length);
 }
 
 async function loadCategories() {
@@ -131,31 +196,9 @@ async function loadCategories() {
     return [];
   }
 
-  categoriesList.innerHTML = "";
-
-  productCategory.innerHTML = `<option value="">Selecione</option>`;
-
-  data.forEach((category) => {
-    const item = document.createElement("div");
-    item.className = "category-item";
-    item.innerHTML = `
-      <h4>${category.name}</h4>
-      <p>Slug: ${category.slug}</p>
-      <p>Ordem: ${category.order_index}</p>
-      <p>Status: ${category.active ? "Ativa" : "Inativa"}</p>
-    `;
-    categoriesList.appendChild(item);
-
-    if (category.active) {
-      const option = document.createElement("option");
-      option.value = category.id;
-      option.textContent = category.name;
-      productCategory.appendChild(option);
-    }
-  });
-
-  totalCategories.textContent = String(data.length);
-  return data;
+  currentCategories = data || [];
+  renderCategories();
+  return currentCategories;
 }
 
 async function loadProducts() {
@@ -174,41 +217,150 @@ async function loadProducts() {
     return [];
   }
 
-  productsList.innerHTML = "";
-
-  data.forEach((product) => {
-    const item = document.createElement("div");
-    item.className = "product-admin-item";
-
-    item.innerHTML = `
-      <img src="${product.image_url || "https://placehold.co/300x300?text=Sem+Imagem"}" alt="${product.name}" />
-      <div>
-        <h4>${product.name}</h4>
-        <p>${product.description || "Sem descrição."}</p>
-        <div class="product-meta">
-          <span class="meta-badge">${formatPrice(product.price)}</span>
-          <span class="meta-badge">${product.categories?.name || "Sem categoria"}</span>
-          ${product.sizes ? `<span class="meta-badge">${product.sizes}</span>` : ""}
-          ${product.is_promo ? `<span class="meta-badge">Promoção</span>` : ""}
-          ${product.is_featured ? `<span class="meta-badge">Destaque</span>` : ""}
-          <span class="meta-badge">${product.active ? "Ativo" : "Inativo"}</span>
-        </div>
-      </div>
-    `;
-
-    productsList.appendChild(item);
-  });
-
-  totalProducts.textContent = String(data.length);
-  totalPromos.textContent = String(data.filter((item) => item.is_promo).length);
-  totalFeatured.textContent = String(data.filter((item) => item.is_featured).length);
-
-  return data;
+  currentProducts = data || [];
+  renderProducts();
+  return currentProducts;
 }
 
 async function refreshDashboard() {
   await loadCategories();
   await loadProducts();
+}
+
+function resetCategoryForm() {
+  editingCategoryId = null;
+  categoryForm.reset();
+  document.getElementById("categoryOrder").value = "0";
+  document.getElementById("categoryActive").checked = true;
+  const submitBtn = categoryForm.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.textContent = "Salvar categoria";
+}
+
+function resetProductForm() {
+  editingProductId = null;
+  productForm.reset();
+  document.getElementById("productActive").checked = true;
+  const submitBtn = productForm.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.textContent = "Salvar produto";
+}
+
+async function ensureSeedButton() {
+  const dashboardSection = document.getElementById("dashboard-section");
+  if (!dashboardSection || document.getElementById("seedProductsBtn")) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.style.marginTop = "22px";
+  wrapper.innerHTML = `
+    <button id="seedProductsBtn" class="btn-primary" type="button">
+      Importar produtos atuais do site
+    </button>
+  `;
+  dashboardSection.appendChild(wrapper);
+
+  document.getElementById("seedProductsBtn").addEventListener("click", seedInitialProducts);
+}
+
+async function seedInitialProducts() {
+  try {
+    const { data: existing } = await supabaseClient
+      .from("products")
+      .select("slug");
+
+    const existingSlugs = new Set((existing || []).map((p) => p.slug));
+
+    const categoryMap = {};
+    currentCategories.forEach((c) => {
+      categoryMap[c.slug] = c.id;
+    });
+
+    const productsToInsert = [
+      {
+        name: "Conjunto Atena",
+        slug: "conjunto-atena",
+        price: 140,
+        image_url: "images/conjunto-atena.jpg",
+        category_id: categoryMap["conjuntos-com-calca"] || null,
+        sizes: "P/M/G",
+        description: "Conjunto com calça.",
+        is_promo: false,
+        is_featured: true,
+        active: true
+      },
+      {
+        name: "Conjunto Lia",
+        slug: "conjunto-lia",
+        price: 140,
+        image_url: "images/conjunto-lia.jpg",
+        category_id: categoryMap["conjuntos-com-calca"] || null,
+        sizes: "P/M/G",
+        description: "Conjunto com calça.",
+        is_promo: false,
+        is_featured: false,
+        active: true
+      },
+      {
+        name: "Conjunto Zayra",
+        slug: "conjunto-zayra",
+        price: 140,
+        image_url: "images/conjunto-zayra.jpg",
+        category_id: categoryMap["conjuntos-com-calca"] || null,
+        sizes: "P/M/G",
+        description: "Conjunto com calça.",
+        is_promo: false,
+        is_featured: false,
+        active: true
+      },
+      {
+        name: "Conjunto Lua",
+        slug: "conjunto-lua",
+        price: 140,
+        image_url: "images/conjunto-lua.jpg",
+        category_id: categoryMap["conjuntos-com-calca"] || null,
+        sizes: "M/G/GG",
+        description: "Conjunto com calça.",
+        is_promo: false,
+        is_featured: false,
+        active: true
+      },
+      {
+        name: "Aura + Shorts",
+        slug: "aura-shorts",
+        price: 120,
+        image_url: "images/aura-shorts.jpg",
+        category_id: categoryMap["conjuntos-com-bermuda"] || null,
+        sizes: "P/M/G",
+        description: "Conjunto com bermuda.",
+        is_promo: false,
+        is_featured: false,
+        active: true
+      },
+      {
+        name: "Shorts Colete",
+        slug: "shorts-colete",
+        price: 120,
+        image_url: "images/shorts-colete.jpg",
+        category_id: categoryMap["conjuntos-com-bermuda"] || null,
+        sizes: "P/M/G/GG",
+        description: "Conjunto com bermuda.",
+        is_promo: false,
+        is_featured: true,
+        active: true
+      }
+    ].filter((item) => !existingSlugs.has(item.slug));
+
+    if (!productsToInsert.length) {
+      showToast("Os produtos atuais já foram importados.");
+      return;
+    }
+
+    const { error } = await supabaseClient.from("products").insert(productsToInsert);
+    if (error) throw error;
+
+    showToast("Produtos atuais importados com sucesso.");
+    await loadProducts();
+  } catch (err) {
+    showToast(err.message || "Erro ao importar produtos.", "error");
+  }
 }
 
 loginForm.addEventListener("submit", async (e) => {
@@ -230,10 +382,13 @@ loginForm.addEventListener("submit", async (e) => {
   showToast("Login realizado com sucesso.");
   setLoggedInUI(true);
   await refreshDashboard();
+  await ensureSeedButton();
 });
 
 logoutBtn.addEventListener("click", async () => {
   await supabaseClient.auth.signOut();
+  resetCategoryForm();
+  resetProductForm();
   setLoggedInUI(false);
   showToast("Você saiu do painel.");
 });
@@ -245,28 +400,44 @@ categoryForm.addEventListener("submit", async (e) => {
   const slugInput = document.getElementById("categorySlug").value.trim();
   const orderIndex = Number(document.getElementById("categoryOrder").value || 0);
   const active = document.getElementById("categoryActive").checked;
-
   const slug = slugInput || slugify(name);
 
-  const { error } = await supabaseClient.from("categories").insert([
-    {
-      name,
-      slug,
-      order_index: orderIndex,
-      active,
-    },
-  ]);
+  if (editingCategoryId) {
+    const { error } = await supabaseClient
+      .from("categories")
+      .update({
+        name,
+        slug,
+        order_index: orderIndex,
+        active,
+      })
+      .eq("id", editingCategoryId);
 
-  if (error) {
-    showToast(error.message || "Erro ao salvar categoria.", "error");
-    return;
+    if (error) {
+      showToast(error.message || "Erro ao atualizar categoria.", "error");
+      return;
+    }
+
+    showToast("Categoria atualizada com sucesso.");
+  } else {
+    const { error } = await supabaseClient.from("categories").insert([
+      {
+        name,
+        slug,
+        order_index: orderIndex,
+        active,
+      },
+    ]);
+
+    if (error) {
+      showToast(error.message || "Erro ao salvar categoria.", "error");
+      return;
+    }
+
+    showToast("Categoria salva com sucesso.");
   }
 
-  categoryForm.reset();
-  document.getElementById("categoryOrder").value = "0";
-  document.getElementById("categoryActive").checked = true;
-
-  showToast("Categoria salva com sucesso.");
+  resetCategoryForm();
   await loadCategories();
 });
 
@@ -283,61 +454,144 @@ productForm.addEventListener("submit", async (e) => {
   const isFeatured = document.getElementById("productFeatured").checked;
   const active = document.getElementById("productActive").checked;
   const imageFile = document.getElementById("productImage").files[0];
-
   const slug = slugInput || slugify(name);
 
   try {
     let imageUrl = null;
 
+    if (editingProductId) {
+      const existingProduct = currentProducts.find((p) => p.id === editingProductId);
+      imageUrl = existingProduct?.image_url || null;
+    }
+
     if (imageFile) {
       imageUrl = await uploadProductImage(imageFile, slug);
     }
 
-    const { error } = await supabaseClient.from("products").insert([
-      {
-        name,
-        slug,
-        price,
-        image_url: imageUrl,
-        category_id: categoryId || null,
-        sizes,
-        description,
-        is_promo: isPromo,
-        is_featured: isFeatured,
-        active,
-      },
-    ]);
+    const payload = {
+      name,
+      slug,
+      price,
+      image_url: imageUrl,
+      category_id: categoryId || null,
+      sizes,
+      description,
+      is_promo: isPromo,
+      is_featured: isFeatured,
+      active,
+    };
 
-    if (error) {
-      showToast(error.message || "Erro ao salvar produto.", "error");
-      return;
+    if (editingProductId) {
+      const { error } = await supabaseClient
+        .from("products")
+        .update(payload)
+        .eq("id", editingProductId);
+
+      if (error) {
+        showToast(error.message || "Erro ao atualizar produto.", "error");
+        return;
+      }
+
+      showToast("Produto atualizado com sucesso.");
+    } else {
+      const { error } = await supabaseClient.from("products").insert([payload]);
+
+      if (error) {
+        showToast(error.message || "Erro ao salvar produto.", "error");
+        return;
+      }
+
+      showToast("Produto cadastrado com sucesso.");
     }
 
-    productForm.reset();
-    document.getElementById("productActive").checked = true;
-
-    showToast("Produto cadastrado com sucesso.");
+    resetProductForm();
     await loadProducts();
   } catch (err) {
     showToast(err.message || "Erro ao enviar imagem.", "error");
   }
 });
 
-async function checkSession() {
-  const { data, error } = await supabaseClient.auth.getSession();
+categoriesList.addEventListener("click", async (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
 
-  if (error) {
-    setLoggedInUI(false);
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+  const category = currentCategories.find((c) => c.id === id);
+  if (!category) return;
+
+  if (action === "edit-category") {
+    editingCategoryId = category.id;
+    document.getElementById("categoryName").value = category.name;
+    document.getElementById("categorySlug").value = category.slug;
+    document.getElementById("categoryOrder").value = category.order_index ?? 0;
+    document.getElementById("categoryActive").checked = !!category.active;
+
+    const submitBtn = categoryForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = "Atualizar categoria";
+
+    setActiveSection("category-section");
     return;
   }
 
-  if (data.session) {
-    setLoggedInUI(true);
-    await refreshDashboard();
-  } else {
-    setLoggedInUI(false);
+  if (action === "delete-category") {
+    const confirmed = window.confirm(`Excluir a categoria "${category.name}"?`);
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient.from("categories").delete().eq("id", id);
+    if (error) {
+      showToast(error.message || "Erro ao excluir categoria.", "error");
+      return;
+    }
+
+    showToast("Categoria removida com sucesso.");
+    await loadCategories();
   }
-}
+});
+
+productsList.addEventListener("click", async (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+  const product = currentProducts.find((p) => p.id === id);
+  if (!product) return;
+
+  if (action === "edit-product") {
+    editingProductId = product.id;
+
+    document.getElementById("productName").value = product.name || "";
+    document.getElementById("productSlug").value = product.slug || "";
+    document.getElementById("productPrice").value = product.price ?? "";
+    document.getElementById("productCategory").value = product.category_id || "";
+    document.getElementById("productSizes").value = product.sizes || "";
+    document.getElementById("productDescription").value = product.description || "";
+    document.getElementById("productPromo").checked = !!product.is_promo;
+    document.getElementById("productFeatured").checked = !!product.is_featured;
+    document.getElementById("productActive").checked = !!product.active;
+
+    const submitBtn = productForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = "Atualizar produto";
+
+    setActiveSection("product-section");
+    return;
+  }
+
+  if (action === "delete-product") {
+    const confirmed = window.confirm(`Excluir o produto "${product.name}"?`);
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient.from("products").delete().eq("id", id);
+    if (error) {
+      showToast(error.message || "Erro ao excluir produto.", "error");
+      return;
+    }
+
+    showToast("Produto removido com sucesso.");
+    await loadProducts();
+  }
+});
 
 document.getElementById("categoryName").addEventListener("input", (e) => {
   const slugField = document.getElementById("categorySlug");
@@ -365,9 +619,28 @@ supabaseClient.auth.onAuthStateChange(async (_event, session) => {
   if (session) {
     setLoggedInUI(true);
     await refreshDashboard();
+    await ensureSeedButton();
   } else {
     setLoggedInUI(false);
   }
 });
 
+async function checkSession() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    setLoggedInUI(false);
+    return;
+  }
+
+  if (data.session) {
+    setLoggedInUI(true);
+    await refreshDashboard();
+    await ensureSeedButton();
+  } else {
+    setLoggedInUI(false);
+  }
+}
+
+attachNavEvents();
 checkSession();
