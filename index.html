@@ -117,7 +117,7 @@
           <p>Uma vitrine organizada para a cliente encontrar rapidamente o que procura.</p>
         </div>
 
-        <div class="category-grid">
+        <div class="category-grid" id="categoryGrid">
           <a href="#colecao" class="category-card">Conjuntos com calça</a>
           <a href="#colecao" class="category-card">Conjuntos com bermuda</a>
           <a href="#colecao" class="category-card">Looks elegantes</a>
@@ -128,134 +128,21 @@
       </div>
     </section>
 
+    <div id="dynamicCategories"></div>
+
     <section class="products" id="colecao">
       <div class="container">
         <div class="section-top reveal">
           <div>
             <span class="section-label">Nossa vitrine</span>
-            <h3>Coleção em destaque</h3>
+            <h3>Todos os produtos</h3>
           </div>
           <p>
-            Uma seleção pensada para destacar beleza, conforto e personalidade. Cada peça leva a cliente
-            direto para o atendimento no WhatsApp.
+            Confira as peças cadastradas no catálogo da loja e fale direto no WhatsApp.
           </p>
         </div>
 
-        <div class="product-grid">
-          <article class="product-card reveal">
-            <div class="product-image-wrap">
-              <span class="product-badge">Destaque</span>
-              <img src="images/conjunto-atena.jpg" alt="Conjunto Atena" />
-            </div>
-            <div class="product-info">
-              <span>Conjunto com calça</span>
-              <h4>Conjunto Atena</h4>
-              <a
-                class="btn btn-primary"
-                href="https://wa.me/5511948015587?text=Olá!%20Tenho%20interesse%20no%20Conjunto%20Atena%20da%20Lafaett%20Modas."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Tenho interesse
-              </a>
-            </div>
-          </article>
-
-          <article class="product-card reveal delay-1">
-            <div class="product-image-wrap">
-              <span class="product-badge">Novo</span>
-              <img src="images/conjunto-lia.jpg" alt="Conjunto Lia" />
-            </div>
-            <div class="product-info">
-              <span>Conjunto com calça</span>
-              <h4>Conjunto Lia</h4>
-              <a
-                class="btn btn-primary"
-                href="https://wa.me/5511948015587?text=Olá!%20Tenho%20interesse%20no%20Conjunto%20Lia%20da%20Lafaett%20Modas."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Tenho interesse
-              </a>
-            </div>
-          </article>
-
-          <article class="product-card reveal delay-2">
-            <div class="product-image-wrap">
-              <span class="product-badge">Elegante</span>
-              <img src="images/conjunto-zayra.jpg" alt="Conjunto Zayra" />
-            </div>
-            <div class="product-info">
-              <span>Conjunto com calça</span>
-              <h4>Conjunto Zayra</h4>
-              <a
-                class="btn btn-primary"
-                href="https://wa.me/5511948015587?text=Olá!%20Tenho%20interesse%20no%20Conjunto%20Zayra%20da%20Lafaett%20Modas."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Tenho interesse
-              </a>
-            </div>
-          </article>
-
-          <article class="product-card reveal">
-            <div class="product-image-wrap">
-              <span class="product-badge">Leve</span>
-              <img src="images/conjunto-lua.jpg" alt="Conjunto Lua" />
-            </div>
-            <div class="product-info">
-              <span>Conjunto com calça</span>
-              <h4>Conjunto Lua</h4>
-              <a
-                class="btn btn-primary"
-                href="https://wa.me/5511948015587?text=Olá!%20Tenho%20interesse%20no%20Conjunto%20Lua%20da%20Lafaett%20Modas."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Tenho interesse
-              </a>
-            </div>
-          </article>
-
-          <article class="product-card reveal delay-1">
-            <div class="product-image-wrap">
-              <span class="product-badge">Novo</span>
-              <img src="images/aura-shorts.jpg" alt="Aura + Shorts" />
-            </div>
-            <div class="product-info">
-              <span>Conjunto com bermuda</span>
-              <h4>Aura + Shorts</h4>
-              <a
-                class="btn btn-primary"
-                href="https://wa.me/5511948015587?text=Olá!%20Tenho%20interesse%20no%20Aura%20%2B%20Shorts%20da%20Lafaett%20Modas."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Tenho interesse
-              </a>
-            </div>
-          </article>
-
-          <article class="product-card reveal delay-2">
-            <div class="product-image-wrap">
-              <span class="product-badge">Destaque</span>
-              <img src="images/shorts-colete.jpg" alt="Shorts Colete" />
-            </div>
-            <div class="product-info">
-              <span>Conjunto com bermuda</span>
-              <h4>Shorts Colete</h4>
-              <a
-                class="btn btn-primary"
-                href="https://wa.me/5511948015587?text=Olá!%20Tenho%20interesse%20no%20Shorts%20Colete%20da%20Lafaett%20Modas."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Tenho interesse
-              </a>
-            </div>
-          </article>
-        </div>
+        <div class="product-grid" id="productGrid"></div>
       </div>
     </section>
 
@@ -403,6 +290,13 @@
     </div>
   </footer>
 
+  <script>
+    window.SUPABASE_URL = "https://nikkvbgoozjeavwvmhjh.supabase.co";
+    window.SUPABASE_ANON_KEY = "sb_publishable_uo3sk48kKVnZA6Fav_G_fw_GgahFdd-";
+    window.WHATSAPP_NUMBER = "5511948015587";
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>
